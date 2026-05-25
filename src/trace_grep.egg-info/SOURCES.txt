@@ -1,0 +1,11 @@
+LICENSE
+README.md
+pyproject.toml
+src/trace_grep/__init__.py
+src/trace_grep/core.py
+src/trace_grep/py.typed
+src/trace_grep.egg-info/PKG-INFO
+src/trace_grep.egg-info/SOURCES.txt
+src/trace_grep.egg-info/dependency_links.txt
+src/trace_grep.egg-info/top_level.txt
+tests/test_grep.py
