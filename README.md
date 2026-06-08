@@ -44,6 +44,11 @@ from trace_grep import grep_file
 matches = grep_file("logs/run.jsonl", pattern="error", has_error=True)
 ```
 
+Each non-blank line of the file must be a JSON **object**. Blank lines are
+skipped; a malformed line or a line that is valid JSON but not an object
+(e.g. a bare string or array) raises `TraceGrepError` with the offending
+line number.
+
 ## Combine criteria (AND)
 
 ```python
@@ -81,6 +86,33 @@ Shorthand: filter by a specific field.
 ### `grep_file(source, **kwargs)`
 
 Load a JSONL file and apply filters.
+
+## Behaviour notes
+
+- All filters are **AND**-combined; an event must satisfy every supplied
+  criterion to match.
+- `pattern`, `value_contains`, and `value_regex` are **case-insensitive** and
+  match against the string form of each value.
+- `value`, `value_contains`, and `value_regex` search a single `field` when
+  one is given, otherwise they scan every field of the event.
+- `has_error` treats `error`, `err`, and `exception` as error fields, and a
+  *falsy* value (e.g. `""`, `0`, `null`) counts as **no error**.
+- `invert=True` returns the events that do **not** match; their
+  `matched_fields` is empty.
+
+## Development
+
+The library has no runtime dependencies and the test suite uses only the
+Python standard library (`unittest`):
+
+```bash
+git clone https://github.com/MukundaKatta/trace-grep
+cd trace-grep
+python -m unittest discover -s tests
+```
+
+CI runs the same command on Python 3.10–3.13 (see
+`.github/workflows/ci.yml`).
 
 ## License
 
