@@ -27,9 +27,14 @@ def _load_jsonl(source: str | Path) -> list[dict[str, Any]]:
         if not line:
             continue
         try:
-            events.append(json.loads(line))
+            obj = json.loads(line)
         except json.JSONDecodeError as e:
             raise TraceGrepError(f"{p}:{lineno}: invalid JSON: {e}") from e
+        if not isinstance(obj, dict):
+            raise TraceGrepError(
+                f"{p}:{lineno}: expected a JSON object, got {type(obj).__name__}"
+            )
+        events.append(obj)
     return events
 
 
@@ -101,6 +106,10 @@ def grep_events(
     results: list[GrepMatch] = []
 
     for idx, event in enumerate(events):
+        if not isinstance(event, dict):
+            raise TraceGrepError(
+                f"event at index {idx} must be a dict, got {type(event).__name__}"
+            )
         matched = _matches(
             event,
             pattern=pattern,
